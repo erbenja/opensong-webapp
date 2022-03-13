@@ -2,28 +2,29 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const x2j = require('xml2js');
 const _ = require('lodash');
+const { nameToId } = require('../services/songs');
+const { xmlSongsDir, jsonSongsDir, backupDir } = require('../config.js');
 
 async function generate() {
-    const from = './resources/xmlSongs/';
-    const to = './resources/jsonSongs/';
-    const backupDir = './resources/backups/';
-    const xmlFileNames = fs.readdirSync('./resources/xmlSongs/');
-    const jsonFileNames = fs.readdirSync('./resources/jsonSongs/');
+    const from = xmlSongsDir;
+    const to = jsonSongsDir;
+    const xmlFileNames = fs.readdirSync(xmlSongsDir);
+    const jsonFileNames = fs.readdirSync(jsonSongsDir);
 
     const jsonFileNamesTrimed = jsonFileNames.map(fileName => fileName.replace('.json', ''));
 
     const generateNeeded = xmlFileNames.filter(fileName => !jsonFileNamesTrimed.includes(nameToId(fileName)));
 
-    // if (!generateNeeded.length) {
-    //     return console.log('No generating needed');
-    // }
+    if (!generateNeeded.length) {
+        return console.log('No generating needed');
+    }
 
     const backupName = `${getDateString()}-jsonSongs`;
-    console.log(backupName);
-    await backupJsons(to, `${backupDir}${backupName}`)
+    await backupJsons(to, `${backupDir}${backupName}`);
+    console.log(`Backup finished to ${backupName}`);
 
-    // console.log(`Generating new files [${generateNeeded.length}]`)
-    // generateNeeded.forEach(async fileName => await convertSong(fileName, from, to))
+    console.log(`Generating new files [${generateNeeded.length}]`)
+    generateNeeded.forEach(async fileName => await convertSong(fileName, from, to))
 }
 
 async function backupJsons(from, to) {
@@ -58,8 +59,8 @@ async function convertSong(fileName, from = './resources/xmlSongs/', to = './res
     }
 
     const result = {
-        title: title,
-        number: hymn_number,
+        title: title[0],
+        number: hymn_number[0],
         presentation: presentationParsed,
         lyrics: lyricsMapped
     }
@@ -68,11 +69,6 @@ async function convertSong(fileName, from = './resources/xmlSongs/', to = './res
     fs.writeFileSync(`${to}${id}.json`, JSON.stringify(result));
 
     return;
-}
-
-function nameToId(name) {
-    const id = name.split(' ')[0];
-    return _.padStart(id, 3, 0);
 }
 
 function getDateString() {
