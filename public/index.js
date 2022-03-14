@@ -1,18 +1,20 @@
-const songs = [];
-let slides = [];
-let currentIndex = 0;
-const LYRICS = document.querySelector('#lyrics');
-const NUMBER = document.querySelector('#number');
-const EMPTY_SLIDE = {lyrics: '', number: ''}
+const FORM = document.querySelector('form');
+const ADD_BTN = document.querySelector('#add-btn')
+const SUBMIT_BTN = document.querySelector('#submit-btn')
 
+FORM.addEventListener('submit', submit);
 
-async function getData() {
-    const url = new URL(location);
-    let params = new URLSearchParams(url.search);
-    let ids = params.get('ids') // 'chrome-instant'
-    ids = ids.split(',');
+async function submit(e) {
+    e.preventDefault();
 
-    const body = { ids }
+    const inputs = document.querySelectorAll('form>div>input');
+    const ids = Object.values(inputs).map(a => a.value);
+
+    if (!ids.length) {
+        return alert('Seznam je prázdný. Vyplňte nejméně jednu píseň.')
+    }
+
+    const body = { ids };
 
     const check = await fetch('/api/songs/check', {
         method: 'POST',
@@ -24,59 +26,38 @@ async function getData() {
 
     if (check.status !== 200) {
         const checkResult = await check.json();
-        return alert(`Data not loaded for ids: ${checkResult}`);
+        return alert(`Nepodařilo se načíst písně: ${checkResult}`);
     }
 
-    for (let i = 0; i < ids.length; i += 1) {
-        const res = await fetch(`/api/songs/${ids[i]}`);
-        if (res.status !== 200) {
-            alert(`Issue loading ${ids[i]}`);
-            continue;
-        }
-        const song = await res.json();
-        songs.push(song);
-    }
-
-    return;
-
+    document.location.href = `./presentation?ids=${ids.join(',')}`;
 }
 
-function formatSlides(songs) {
-    const slides = [EMPTY_SLIDE];
-    songs.forEach(song => {
-        song.presentation.forEach(key => {
-            slides.push({ lyrics: song.lyrics[key], number: song.number })
-        })
-        slides.push(EMPTY_SLIDE);
+ADD_BTN.addEventListener('click', () => {
+    FORM.insertBefore(getNewInput(), ADD_BTN);
+})
+
+function getNewInput() {
+    const id = Date.now();
+    const container = document.createElement('div');
+    container.id = `id${id}`;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.onwheel = () => false;
+    input.required = true;
+    const removeBtn = document.createElement('div');
+    removeBtn.innerText = '-';
+    removeBtn.id = 'remove-btn';
+    removeBtn.classList.add('btn');
+    removeBtn.addEventListener('click', () => {
+        const el = document.querySelector(`#id${id}`);
+        el.remove();
     })
 
-    return slides;
+    //compose elements
+    container.appendChild(input);
+    container.appendChild(removeBtn);
+    return container;
 }
 
-function keyPress(e) {
-    if (e.code === 'ArrowRight') {
-        currentIndex += 1;
-    }
-    if (e.code === 'ArrowLeft') {
-        currentIndex -= 1;
-    }
-
-    currentIndex = Math.max(0, Math.min(currentIndex, slides.length - 1));
-
-    changeSlide(slides[currentIndex]);
-}
-
-function changeSlide(slide) {
-    LYRICS.innerText = slide.lyrics;
-    NUMBER.innerText = slide.number;
-}
-
-getData()
-    .then(res => {
-        console.log(songs);
-        slides = formatSlides(songs);
-        window.addEventListener('keydown', keyPress);
-        changeSlide(slides[currentIndex]);
-
-    })
-    .catch(err => console.log(err));
+// init first input
+FORM.insertBefore(getNewInput(), ADD_BTN);
