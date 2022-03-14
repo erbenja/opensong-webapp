@@ -61,10 +61,11 @@ function formatSlides(songs) {
 }
 
 function keyPress(e) {
-    if (e.code === 'ArrowRight') {
+    const { code } = e;
+    if (code === 'ArrowRight' || code === 'PageDown') {
         changeIndex(1);
     }
-    if (e.code === 'ArrowLeft') {
+    if (code === 'ArrowLeft' || code === 'PageUp') {
         changeIndex(-1);
     }
 }
