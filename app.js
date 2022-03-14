@@ -4,7 +4,7 @@ const express = require('express')
 const { getById, nonExistingFiles } = require('./services/songs');
 
 const app = express()
-const port = process.env.port || 3000
+const port = process.env.port || 4000
 
 app.use(json({ type: 'application/json' }))
 
