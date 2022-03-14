@@ -3,6 +3,8 @@ let slides = [];
 let currentIndex = 0;
 const LYRICS = document.querySelector('#lyrics');
 const NUMBER = document.querySelector('#number');
+const MOVE_LEFT = document.querySelector('#move-left');
+const MOVE_RIGHT = document.querySelector('#move-right');
 const EMPTY_SLIDE = {lyrics: '', number: ''}
 
 
@@ -60,21 +62,24 @@ function formatSlides(songs) {
 
 function keyPress(e) {
     if (e.code === 'ArrowRight') {
-        currentIndex += 1;
+        changeIndex(1);
     }
     if (e.code === 'ArrowLeft') {
-        currentIndex -= 1;
+        changeIndex(-1);
     }
-
-    currentIndex = Math.max(0, Math.min(currentIndex, slides.length - 1));
-
-    changeSlide(slides[currentIndex]);
 }
 
-function changeSlide(slide) {
+function changeIndex(steps) {
+    console.log('clicked')
+    currentIndex += steps;
+    currentIndex = Math.max(0, Math.min(currentIndex, slides.length - 1));
+    updateSlide(slides[currentIndex]);
+}
+
+function updateSlide(slide) {
     LYRICS.innerText = slide.lyrics;
     NUMBER.innerText = slide.number;
-    resizeText({ elements: [LYRICS  ] })
+    resizeText({ elements: [LYRICS] })
 }
 
 getData()
@@ -83,7 +88,9 @@ getData()
         slides = formatSlides(songs);
         console.log(slides);
         window.addEventListener('keydown', keyPress);
-        changeSlide(slides[currentIndex]);
+        MOVE_LEFT.addEventListener('click', () => { return changeIndex(-1) });
+        MOVE_RIGHT.addEventListener('click', () => { return changeIndex(1) });
+        updateSlide(slides[currentIndex]);
 
     })
     .catch(err => console.log(err));

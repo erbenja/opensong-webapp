@@ -39,6 +39,23 @@ a:link,  a:visited {
     background-color: white;
 }
 
+.navigation {
+    background: transparent;
+    position: absolute;
+    top: 0;
+    width: 50vw;
+    height: 100%;
+}
+
+#move-left {
+    left: 0;
+}
+
+#move-right {
+    right: 0;
+}
+
+
 #lyrics {
     white-space: nowrap;
 }
