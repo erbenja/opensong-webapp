@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node index.js",
+    "start": "node app.js",
     "genJsons": "node scripts/generateJsons.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -3,12 +3,14 @@ const fse = require('fs-extra');
 const x2j = require('xml2js');
 const _ = require('lodash');
 const { nameToId } = require('../services/songs');
-const { xmlSongsDir, jsonSongsDir, backupDir } = require('../config.js');
+const { xmlSongsDir, jsonSongsDir, backupDir } = require('../config.json');
 
 async function generate() {
     const from = xmlSongsDir;
     const to = jsonSongsDir;
+    if (!fs.existsSync(xmlSongsDir)) { fs.mkdirSync(xmlSongsDir); }
     const xmlFileNames = fs.readdirSync(xmlSongsDir);
+    if (!fs.existsSync(jsonSongsDir)) { fs.mkdirSync(jsonSongsDir); }
     const jsonFileNames = fs.readdirSync(jsonSongsDir);
 
     const jsonFileNamesTrimed = jsonFileNames.map(fileName => fileName.replace('.json', ''));
