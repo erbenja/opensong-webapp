@@ -44,8 +44,9 @@ async function convertSong(fileName, from = './resources/xmlSongs/', to = './res
 
     const names = lyrics[0].match(/\[\w+\]/g);
     const namesTrimmed = names.map(a => a.replace(/\[|\]/g, ''));
-    const values = lyrics[0].split(/\[\w+\]/g);
-    values.shift();
+    const rawValues = lyrics[0].split(/\[\w+\]/g);
+    rawValues.shift();
+    const values = rawValues.map(a => a.replace(/\r\n \r\n/g, '\r\n'));
 
     const lyricsMapped = {}
     if (namesTrimmed.length !== values.length) {
